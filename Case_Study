@@ -1,0 +1,85 @@
+use sakila;
+-- =======================================================================================================================================================
+-- TASK-1:- the sakila rental sotr management wants to know the names of all actors in their movie collection display the firstname, lastname and 
+-- actor_id and the details of last updated column
+-- =======================================================================================================================================================
+select a.actor_id, a.first_name, a.last_name, fa.last_update 
+from film_actor as fa inner join actor as a using(actor_id) 
+group by actor_id;
+-- =======================================================================================================================================================
+-- a) Display the full name of the all actors
+-- b) Display the first name of actor along with the count of repeated first names
+-- c) Display the last name of actor along with the repeted last name
+-- =======================================================================================================================================================
+select concat(first_name,' ',last_name)as full_name from actor;
+select first_name, count(first_name)as total_count from actor group by first_name;
+select last_name, count(last_name)as total_count from actor group by last_name;
+-- =======================================================================================================================================================
+-- TASK-3:- Display the count of movie grouped by ratings
+-- =======================================================================================================================================================
+select rating, count(title) as count_of_movie from film 
+group by rating;
+-- =======================================================================================================================================================
+-- TASK-4:- Calculate and display average rental based on the movie rating
+-- =======================================================================================================================================================
+select rating, avg(rental_rate) from film 
+group by rating;
+-- =======================================================================================================================================================
+-- TASK-5:- a) Display the movie title where replacement cost is up to $9
+-- b)Display the movie title where the replacement cost is between 15 to 20
+-- c) Display the movie title where highest replacement cost and lowest rental cost
+-- =======================================================================================================================================================
+select title, replacement_cost from film where replacement_cost>= 9;
+select title, replacement_cost from film where replacement_cost between 15 and 20;
+select title from film 
+where replacement_cost=(select max(replacement_cost) from film) and 
+rental_rate=(select min(rental_rate) from film);
+-- =======================================================================================================================================================
+-- TASK-6:- the management need the list of all movies along with the number of actors listed for each movie
+-- =======================================================================================================================================================
+select title, count(actor_id)as total_actors from film 
+join film_actor using(film_id) 
+group by title;
+-- =======================================================================================================================================================
+-- TASK-7:- Movies starting with letter K and Q have also sorted in popularity Display the movie title
+-- =======================================================================================================================================================
+select title from film 
+where title like 'H%' or 'Q%'
+order by rental_duration desc; 
+-- =======================================================================================================================================================
+-- TASK-8:- Display firstname and lastname of the all actor who are the part of 'agent truman' movie
+-- =======================================================================================================================================================
+select a.first_name, a.last_name from actor as a 
+join film_actor using(actor_id) 
+join film using(film_id) 
+where title='agent truman';
+-- =======================================================================================================================================================
+-- TASK-9:- Identify and display the all movie names in children and family category
+-- =======================================================================================================================================================
+select title from film 
+join film_category using(film_id) 
+join category using(category_id) 
+where category.name in ('children','family');
+-- =======================================================================================================================================================
+-- TASK-10:- Display the names of the most frequently rented movie in desc order 
+-- =======================================================================================================================================================
+select title, count(inventory_id)as most_rented from inventory 
+join film using(film_id) group by film_id 
+order by most_rented desc;
+-- =======================================================================================================================================================
+-- TASK-11:- calculate and display the number of movie categories where average differance between the movie replacement costand rental rate is more than 15
+-- =======================================================================================================================================================
+select c.name,count(*)as total from category as c 
+inner join film_category using(category_id) 
+inner join film f using(film_id) 
+where (f.replacement_cost-f.rental_rate)>15 
+group by c.name;
+-- =======================================================================================================================================================
+-- TASK-12:- Display the name of this genre and number of genre sorted by th number of movie betweeen 60 and 70
+-- =======================================================================================================================================================
+select c.name, count(title)as total_movies from category as c 
+join film_category using(category_id) 
+join film using(film_id) 
+group by c.name having total_movies between 60 and 70
+order by total_movies desc;
+
